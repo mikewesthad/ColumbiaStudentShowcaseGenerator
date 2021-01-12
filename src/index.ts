@@ -206,29 +206,6 @@ function buildHtml(
   let html = "";
   let post = "";
 
-  html += `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Document</title>
-      <style>
-        html {
-          font-size: 16px;
-        }
-        main {
-          box-sizing: border-box;
-          width: 100%;
-          max-width: 800px;
-          padding: 0 1rem;
-          margin: 0 auto;
-        }
-      </style>
-  </head>
-  <body>
-    <main>
-  `;
-
   html += `
     <h1 id="top">Showcase</h1>
     <p>Thanks to all the students who submitted work this semester! Explore their work by scrolling through the post or jumping to specific student's work via these links: 
@@ -290,7 +267,28 @@ ${imgPost.join("")}
 &nbsp;`;
   }
 
-  html += `
+  html = `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      <style>
+        html {
+          font-size: 16px;
+        }
+        main {
+          box-sizing: border-box;
+          width: 100%;
+          max-width: 1000px;
+          padding: 0 1rem;
+          margin: 0 auto;
+        }
+      </style>
+  </head>
+  <body>
+    <main>
+    ${html}
     </main>
   </body>
   </html>
