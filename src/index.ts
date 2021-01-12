@@ -25,6 +25,7 @@ program
 
 program.parse(process.argv);
 
+// Use the root to interpret all paths as relative to where the package.json is located.
 const root = pkgDir.sync()!;
 const formDataPath = path.resolve(path.relative(root, program.path));
 const csvPath = path.resolve(path.relative(root, program.csv));
@@ -32,6 +33,7 @@ const outputDirectory = path.resolve(path.relative(root, program.output));
 const outputImagesDirectory = path.join(outputDirectory, "images");
 const wpImagesUrl = program.wpUrl as string;
 
+/** Represents the parsed data for a student's work. */
 type StudentWork = {
   id: string;
   startTime: string;
@@ -47,6 +49,7 @@ type StudentWork = {
   course: string;
 };
 
+/** Represents the hosted URLs of optimized and resized images. */
 type ResizedImageInfo = {
   smallWpUrl: string;
   largeWpUrl: string;
@@ -54,7 +57,13 @@ type ResizedImageInfo = {
   largeLocalUrl: string;
 };
 
-async function parseStudentWork() {
+/**
+ * Parse the given CSV path into an array of StudentWork objects.
+ *
+ * @param {string} csvPath
+ * @returns {Promise<StudentWork[]>}
+ */
+async function parseStudentWork(csvPath: string): Promise<StudentWork[]> {
   const rawData = await parseFormCsv(csvPath);
 
   const processedData: StudentWork[] = [];
@@ -119,7 +128,12 @@ function clearOutputDirectory() {
   fs.mkdirSync(outputImagesDirectory);
 }
 
-// Copy over images to the output directory and optimize them.
+/**
+ * Copy over images to the output directory and optimize them by generating two compressed sizes.
+ *
+ * @param {StudentWork[]} studentWork
+ * @returns {Promise<ResizedImageInfo[][]>}
+ */
 async function generateImages(studentWork: StudentWork[]): Promise<ResizedImageInfo[][]> {
   const resizedImages: ResizedImageInfo[][] = [];
 
@@ -175,10 +189,18 @@ async function generateImages(studentWork: StudentWork[]): Promise<ResizedImageI
   return resizedImages;
 }
 
-// Build HTML for both local debugging and for the WordPress post. The HTML can be viewed in a local
-// browser for quick development. The WP HTML should be pasted into the "text" tab of the WP post
-// editor.
-function buildHtml(studentWork: StudentWork[], resizedImages: ResizedImageInfo[][]) {
+/**
+ * Build two HTML strings - one for local testing and one for the WordPress post. The HTML can be
+ * viewed in a local browser for quick development. The WP HTML can be pasted into the "text" tab of
+ * the WP post editor.
+ * @param studentWork
+ * @param resizedImages
+ * @returns {[string, string]}
+ */
+function buildHtml(
+  studentWork: StudentWork[],
+  resizedImages: ResizedImageInfo[][]
+): [string, string] {
   // We need two separate HTML strings here because the URLs are different for local dev vs the
   // published post AND because WP is finicky when it comes to whitespace.
   let html = "";
@@ -278,11 +300,13 @@ ${imgPost.join("")}
 }
 
 async function main() {
-  const studentWork = await parseStudentWork();
-  clearOutputDirectory();
-  const resizedImages = await generateImages(studentWork);
-  const [post, html] = buildHtml(studentWork, resizedImages);
+  const studentWork = await parseStudentWork(csvPath);
 
+  clearOutputDirectory();
+
+  const resizedImages = await generateImages(studentWork);
+
+  const [post, html] = buildHtml(studentWork, resizedImages);
   fs.writeFileSync(path.join(outputDirectory, "local-test.html"), html);
   fs.writeFileSync(path.join(outputDirectory, "wordpress-post.html"), post);
 }
