@@ -13,14 +13,11 @@ export type ImageInfo = {
  * Generate image data for each image in the given form submission.
  * @param imageString - Semi-colon separated string of images from the form.
  * @param submissionId - The unique ID for this submission in the form.
- * @param baseImageUrl - The URL where the form data is found in sharepoint, e.g.
- * https://columbiacollege.sharepoint.com/sites/IAMStudentWork/Shared Documents/Apps/Microsoft Forms
  * @param formDataPath - The local path where the form data is downloaded, e.g. "../Form Export".
  */
 export default function parseImages(
   imageString: string,
   submissionId: string,
-  baseImageUrl: string,
   formDataPath: string
 ) {
   const images: ImageInfo[] = [];
@@ -30,7 +27,21 @@ export default function parseImages(
     parts.forEach((img, imgIndex) => {
       // Images are URI encoded, so they needed to be decoded to be used as a file path.
       const decodedUrl = decodeURIComponent(img);
-      const localPath = path.normalize(decodedUrl.replace(baseImageUrl, formDataPath));
+
+      // The image URLs will point to a Sharepoint location. We have a local copy that matches the
+      // same directory structure as the Sharepoint data, so we just need the path starting at
+      // "Apps/Microsoft Forms".
+      const parts = decodedUrl.split("/Apps/Microsoft Forms/");
+      if (parts.length === 0) {
+        console.warn(
+          `Image URL format doesn't match expectation. Expected to find a URL with "/Apps/Microsoft Forms/" in it, but found this instead: \n${img}`
+        );
+        return;
+      }
+
+      // With the relative path in hand, we can join it with where the form data is located to find
+      // an image's location.
+      const localPath = path.normalize(path.join(formDataPath, parts[1]));
 
       if (!fs.existsSync(localPath)) {
         console.warn(

@@ -10,10 +10,6 @@ import { trim } from "./utils";
 
 program
   .requiredOption(
-    "-u, --url <url>",
-    "Sharepoint URL where the form was hosted, e.g. https://columbiacollege.sharepoint.com/sites/IAMStudentWork/Shared Documents/Apps/Microsoft Forms"
-  )
-  .requiredOption(
     "-p, --path <path>",
     "Local path to download of the files from sharepoint (relative to the root of this project)"
   )
@@ -35,8 +31,6 @@ const csvPath = path.resolve(path.relative(root, program.csv));
 const outputDirectory = path.resolve(path.relative(root, program.output));
 const outputImagesDirectory = path.join(outputDirectory, "images");
 const wpImagesUrl = program.wpUrl as string;
-const baseImageUrl =
-  "https://columbiacollege.sharepoint.com/sites/IAMStudentWork/Shared Documents/Apps/Microsoft Forms";
 
 type StudentWork = {
   id: string;
@@ -87,7 +81,7 @@ async function parseStudentWork() {
     }
 
     // Generate image data and check that images have been downloaded.
-    const images = parseImages(imageString, id, baseImageUrl, formDataPath);
+    const images = parseImages(imageString, id, formDataPath);
 
     const containsName = processedData.findIndex((d) => d.name === name) !== -1;
     const isCourseWork = isCourseWorkString === "Yes";

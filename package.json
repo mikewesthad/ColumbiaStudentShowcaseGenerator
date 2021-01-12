@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts --url \"https://columbiacollege.sharepoint.com/sites/IAMStudentWork/Shared Documents/Apps/Microsoft Forms\" --path \"./Form Export\" --csv \"./Form Export/📣 Call for Student Work Fall 2020 📣 - Cleaned.csv\" --wpUrl \"../wp-content/uploads/showcases/2020-fall\" --output \"./out\"",
+    "start": "ts-node src/index.ts --path \"./Form Export\" --csv \"./Form Export/📣 Call for Student Work Fall 2020 📣 - Cleaned.csv\" --wpUrl \"../wp-content/uploads/showcases/2020-fall\" --output \"./out\"",
     "help": "ts-node src/index.ts --help"
   },
   "author": "",
