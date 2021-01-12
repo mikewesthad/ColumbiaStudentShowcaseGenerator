@@ -251,7 +251,7 @@ ${studentWork.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}
     <h2 id="student-${id}"><a href="#student-${id}">${title}</a></h2>
     <p>${attributionLine}</p>
     <blockquote>${description}</blockquote>
-    ${linkInfo}
+    <p>${linkInfo}</p>
     ${imgHtml.join("\n")}
     <p><a href="#top">Back to top.</a></p>
     `;
