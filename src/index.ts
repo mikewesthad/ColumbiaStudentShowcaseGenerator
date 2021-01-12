@@ -23,7 +23,7 @@ program
   )
   .requiredOption(
     "-w, --wpUrl <path>",
-    "URL path to where the image files will be hosted on WordPress (e.g. ../wp-content/uploads/showcases/2020-fall)"
+    "URL path to where the image files will be hosted on WordPress. We use a URL that is relative to the post's URL to keep WordPress from converting the images to a JetPack CDN URL since these images aren't added via JetPack/the media library (e.g. ../wp-content/uploads/showcases/2020-fall)."
   )
   .requiredOption("-o, --output <path>", "Local path to store the generated images and HTML.");
 
