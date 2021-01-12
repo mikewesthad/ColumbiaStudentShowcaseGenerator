@@ -283,8 +283,8 @@ async function main() {
   const resizedImages = await generateImages(studentWork);
   const [post, html] = buildHtml(studentWork, resizedImages);
 
-  fs.writeFileSync(path.join(outputDirectory, "index.html"), html);
-  fs.writeFileSync(path.join(outputDirectory, "post.html"), post);
+  fs.writeFileSync(path.join(outputDirectory, "local-test.html"), html);
+  fs.writeFileSync(path.join(outputDirectory, "wordpress-post.html"), post);
 }
 
 main();

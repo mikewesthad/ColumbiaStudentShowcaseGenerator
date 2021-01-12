@@ -27,11 +27,11 @@ You can download both of these via Sharepoint. This tools assumes that you've do
 2. Convert the excel file to a CSV and clean up anything (e.g. typos in submitted links).
 ### Running the Tool
 
-With the data in place locally, you can run the tool. This will generate an output folder (defaults to a folder named "out") with: optimized images, an index.html file for testing, and a post.html file for copy & pasting into WordPress.
+With the data in place locally, you can run the tool. This will generate an output folder (defaults to a folder named "out") with: optimized images, a local-test.html file for testing, and a wordpress-post.html file for copy & pasting into WordPress.
 
 1. Configure the command line arguments passed to the "start" command within the "package.json". This is how the CLI knows where your csv file is, where the images are, etc. You can run `npm run help` for more information on the command line arguments.
 2. Run the node script to generate the optimized image and WordPress post HTML by opening a terminal window and running `npm run start`. This may generate warnings about broken links, duplicate work, etc. It's okay to ignore duplicate work warnings, but the rest should be investigated and fixed. 
-3. Test the generated HTML (index.html) in a local browser to verify images/links/etc. are working.
+3. Test the generated HTML (local-test.html) in a local browser to verify images/links/etc. are working.
 
 ### Uploading to WordPress
 
