@@ -49,5 +49,8 @@ After all that, back up any necessary files for future reference. I recommend zi
 
 ## Future Improvements
 
-- Exclude PDFs from future showcases.
+- Form updates:
+  - Exclude PDFs from future showcases.
+  - Add major/discipline with dropdowns so that work can be categorized.
+  - Crosslist with class catalog somehow?
 - Right now, the image uploading to WordPress bypasses the media library, so it doesn't take full advantage of image optimization. Look into https://wordpress.org/plugins/add-from-server/ - this requires updating WordPress.
