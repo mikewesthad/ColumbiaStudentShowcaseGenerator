@@ -222,18 +222,7 @@ ${studentWork.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}
     const images = resizedImages[i];
 
     const imageWidth = 300;
-    const imgHtml = images.map(({ smallWpUrl, largeWpUrl }, i) => {
-      // Apply margin to create 10px of space between neighboring images.
-      let style = `margin-left: 5px; margin-right: 5px;`;
-      if (images.length === 1) style = "";
-      else if (i === 0) style = `margin-right: 5px`;
-      else if (i === images.length - 1) style = `margin-left: 5px`;
-
-      const alt = `Screenshot #${i + 1} of ${title} by ${credit}`;
-      return `<a href="${largeWpUrl}"><img style="${style}" src="${smallWpUrl}" width="${imageWidth}" alt="${alt}"/></a>`;
-    });
-
-    const imgPost = images.map(({ smallLocalUrl, largeLocalUrl }, i) => {
+    const imgHtml = images.map(({ smallLocalUrl, largeLocalUrl }, i) => {
       // Apply margin to create 10px of space between neighboring images.
       let style = `margin-left: 5px; margin-right: 5px;`;
       if (images.length === 1) style = "";
@@ -242,6 +231,16 @@ ${studentWork.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}
 
       const alt = `Screenshot #${i + 1} of ${title} by ${credit}`;
       return `<a href="${largeLocalUrl}"><img style="${style}" src="${smallLocalUrl}" width="${imageWidth}" alt="${alt}"/></a>`;
+    });
+    const imgPost = images.map(({ smallWpUrl, largeWpUrl }, i) => {
+      // Apply margin to create 10px of space between neighboring images.
+      let style = `margin-left: 5px; margin-right: 5px;`;
+      if (images.length === 1) style = "";
+      else if (i === 0) style = `margin-right: 5px`;
+      else if (i === images.length - 1) style = `margin-left: 5px`;
+
+      const alt = `Screenshot #${i + 1} of ${title} by ${credit}`;
+      return `<a href="${largeWpUrl}"><img style="${style}" src="${smallWpUrl}" width="${imageWidth}" alt="${alt}"/></a>`;
     });
 
     const linkInfo = link ? `See more <a href="${link}">here</a>.` : "";
