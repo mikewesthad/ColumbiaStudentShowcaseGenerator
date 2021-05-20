@@ -272,7 +272,7 @@ async function main() {
 
   clearOutputDirectory(outputDirectory, outputImagesDirectory);
 
-  const resizedImages = await generateImages(studentWork, outputDirectory, outputImagesDirectory);
+  const resizedImages = await generateImages(studentWork, outputImagesDirectory, wpImagesUrl);
 
   const [post, html] = buildHtml(studentWork, resizedImages);
   fs.writeFileSync(path.join(outputDirectory, "local-test.html"), html);
