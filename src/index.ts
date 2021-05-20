@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import validUrl from "valid-url";
-import { program } from "commander";
+import commander, { program } from "commander";
 import pkgDir from "pkg-dir";
 import parseFormCsv from "./parse-form-csv";
 import parseImages, { ImageInfo } from "./parse-images";
@@ -25,13 +25,21 @@ program
 
 program.parse(process.argv);
 
+interface ShowcaseOptions {
+  path: string;
+  csv: string;
+  wpUrl: string;
+  output: string;
+}
+const options = program.opts() as ShowcaseOptions;
+
 // Use the root to interpret all paths as relative to where the package.json is located.
 const root = pkgDir.sync()!;
-const formDataPath = path.resolve(path.relative(root, program.path));
-const csvPath = path.resolve(path.relative(root, program.csv));
-const outputDirectory = path.resolve(path.relative(root, program.output));
+const formDataPath = path.resolve(path.relative(root, options.path));
+const csvPath = path.resolve(path.relative(root, options.csv));
+const outputDirectory = path.resolve(path.relative(root, options.output));
 const outputImagesDirectory = path.join(outputDirectory, "images");
-const wpImagesUrl = program.wpUrl as string;
+const wpImagesUrl = options.wpUrl;
 
 /** Represents the parsed data for a student's work. */
 type StudentWork = {
@@ -208,7 +216,7 @@ function buildHtml(
 
   html += `
     <h1 id="top">Showcase</h1>
-    <p>Thanks to all the students who submitted work this semester! Explore their work by scrolling through the post or jumping to specific student's work via these links: 
+    <p>Thanks to all the students who submitted work this semester! Explore their work by scrolling through the post or jumping to specific student's work via these links:
     ${studentWork.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}</p>
   `;
 
