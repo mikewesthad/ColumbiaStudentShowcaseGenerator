@@ -5,7 +5,7 @@ import validUrl from "valid-url";
 import parseCommandLineArgs from "./parse-command-line-args";
 import parseFormCsv from "./parse-form-csv";
 import parseImages, { ImageInfo } from "./parse-images";
-import { trim } from "./utils";
+import { removeEmptyStrings, trim } from "./utils";
 
 /** Represents the parsed data for a student's work. */
 type StudentWork = {
@@ -19,6 +19,7 @@ type StudentWork = {
   images: ImageInfo[];
   link: string;
   description: string;
+  majors: string[];
   isCourseWork: boolean;
   course: string;
 };
@@ -56,6 +57,7 @@ async function parseStudentWork(
       imageString,
       link,
       description,
+      majorString,
       isCourseWorkString,
       course,
     ] = trimmed;
@@ -63,6 +65,8 @@ async function parseStudentWork(
     if (link !== "" && !validUrl.isUri(link)) {
       console.warn(`Invalid link detected with entry id ${id}: "${link}"`);
     }
+
+    const majors = removeEmptyStrings(majorString.split(";").map(trim));
 
     // Generate image data and check that images have been downloaded.
     const images = parseImages(imageString, id, formDataPath);
@@ -88,6 +92,7 @@ async function parseStudentWork(
       images,
       link,
       description,
+      majors,
       isCourseWork,
       course,
     });
@@ -199,7 +204,7 @@ ${uniqueStudents.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", 
 `;
 
   for (let i = 0; i < studentWork.length; i++) {
-    const { id, title, credit, link, description, isCourseWork, course } = studentWork[i];
+    const { id, title, credit, link, description, majors, isCourseWork, course } = studentWork[i];
     const images = resizedImages[i];
 
     const imageWidth = 300;
@@ -225,26 +230,52 @@ ${uniqueStudents.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", 
     });
 
     const linkInfo = link ? `See more <a href="${link}">here</a>.` : "";
-    const attributionLine = isCourseWork && course !== "" ? `${credit}, ${course}` : credit;
+
+    let courseLine = "";
+    if (isCourseWork)
+      courseLine = `<p style="margin-top: 0; margin-bottom: 0">Produced in: ${course}</p>`;
+
+    let programLine = "";
+    if (majors.length === 0) programLine = "";
+    if (majors.length === 1)
+      programLine = `<p style="margin-top: 0;">IAM Program: ${majors[0]}</p>`;
+    else programLine = `<p style="margin-top: 0;">IAM Programs: ${majors.join(", ")}</p>`;
 
     html += `
-    <h2 id="student-${id}"><a href="#student-${id}">${title}</a></h2>
-    <p>${attributionLine}</p>
+    <section>
+      <header>
+        <h2 id="student-${id}"><a href="#student-${id}">${title}</a></h2>
+        <p style="margin-bottom: 0">${credit}</p>
+        ${courseLine}
+        ${programLine}
+      </header>
+      <blockquote>${description}</blockquote>
+      <p>${linkInfo}</p>
+      ${imgHtml.join("\n")}
+      <footer>
+      <p>
+        <a href="#top">Back to top.</a>
+      </p>
+      </footer>
+    </section>`;
+
+    // WP posts are finnicky with whitespace in the editor.
+    post += `<section>
+    <header>
+      <h2 id="student-${id}"><a href="#student-${id}">${title}</a></h2>
+      <p style="margin-bottom: 0">${credit}</p>
+      ${courseLine}
+      ${programLine}
+    </header>
     <blockquote>${description}</blockquote>
     <p>${linkInfo}</p>
-    ${imgHtml.join("\n")}
-    <p><a href="#top">Back to top.</a></p>
-    `;
-
-    post += `<h2 id="student-${id}"><a href="#student-${id}">${title}</a></h2>
-${attributionLine}
-<blockquote>${description}</blockquote>
-${linkInfo}
-
-${imgPost.join("")}
-
-<a href="#top">Back to top.</a>
-&nbsp;`;
+    ${imgPost.join("")}
+    <footer>
+      <p>
+        <a href="#top">Back to top.</a>
+      </p>
+    </footer>
+</section>`;
   }
 
   html = `<!DOCTYPE html>
