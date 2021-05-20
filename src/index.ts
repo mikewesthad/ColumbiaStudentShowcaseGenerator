@@ -188,7 +188,7 @@ function buildHtml(
 
   // Create a list of unique students for the table of contents.
   const uniqueStudents = studentWork.filter((work1, i) => {
-    if (studentWork.findIndex((work2, j) => work1.name === work2.name) === i) return true;
+    if (studentWork.findIndex((work2) => work1.name === work2.name) === i) return true;
     else return false;
   });
 
