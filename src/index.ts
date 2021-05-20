@@ -2,44 +2,10 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import validUrl from "valid-url";
-import commander, { program } from "commander";
-import pkgDir from "pkg-dir";
+import parseCommandLineArgs from "./parse-command-line-args";
 import parseFormCsv from "./parse-form-csv";
 import parseImages, { ImageInfo } from "./parse-images";
 import { trim } from "./utils";
-
-program
-  .requiredOption(
-    "-p, --path <path>",
-    "Local path to download of the files from sharepoint (relative to the root of this project)"
-  )
-  .requiredOption(
-    "-c, --csv <path>",
-    "Local path to the CSV (relative to the root of this project)"
-  )
-  .requiredOption(
-    "-w, --wpUrl <path>",
-    "URL path to where the image files will be hosted on WordPress. We use a URL that is relative to the post's URL to keep WordPress from converting the images to a JetPack CDN URL since these images aren't added via JetPack/the media library (e.g. ../wp-content/uploads/showcases/2020-fall)."
-  )
-  .requiredOption("-o, --output <path>", "Local path to store the generated images and HTML.");
-
-program.parse(process.argv);
-
-interface ShowcaseOptions {
-  path: string;
-  csv: string;
-  wpUrl: string;
-  output: string;
-}
-const options = program.opts() as ShowcaseOptions;
-
-// Use the root to interpret all paths as relative to where the package.json is located.
-const root = pkgDir.sync()!;
-const formDataPath = path.resolve(path.relative(root, options.path));
-const csvPath = path.resolve(path.relative(root, options.csv));
-const outputDirectory = path.resolve(path.relative(root, options.output));
-const outputImagesDirectory = path.join(outputDirectory, "images");
-const wpImagesUrl = options.wpUrl;
 
 /** Represents the parsed data for a student's work. */
 type StudentWork = {
@@ -67,11 +33,8 @@ type ResizedImageInfo = {
 
 /**
  * Parse the given CSV path into an array of StudentWork objects.
- *
- * @param {string} csvPath
- * @returns {Promise<StudentWork[]>}
  */
-async function parseStudentWork(csvPath: string): Promise<StudentWork[]> {
+async function parseStudentWork(formDataPath: string, csvPath: string): Promise<StudentWork[]> {
   const rawData = await parseFormCsv(csvPath);
 
   const processedData: StudentWork[] = [];
@@ -130,7 +93,7 @@ async function parseStudentWork(csvPath: string): Promise<StudentWork[]> {
 /**
  * Clear the output directory and remake it.
  */
-function clearOutputDirectory() {
+function clearOutputDirectory(outputDirectory: string, outputImagesDirectory: string) {
   fs.rmdirSync(outputDirectory, { recursive: true });
   fs.mkdirSync(outputDirectory);
   fs.mkdirSync(outputImagesDirectory);
@@ -138,11 +101,12 @@ function clearOutputDirectory() {
 
 /**
  * Copy over images to the output directory and optimize them by generating two compressed sizes.
- *
- * @param {StudentWork[]} studentWork
- * @returns {Promise<ResizedImageInfo[][]>}
  */
-async function generateImages(studentWork: StudentWork[]): Promise<ResizedImageInfo[][]> {
+async function generateImages(
+  studentWork: StudentWork[],
+  outputImagesDirectory: string,
+  wpImagesUrl: string
+): Promise<ResizedImageInfo[][]> {
   const resizedImages: ResizedImageInfo[][] = [];
 
   for (const work of studentWork) {
@@ -201,9 +165,6 @@ async function generateImages(studentWork: StudentWork[]): Promise<ResizedImageI
  * Build two HTML strings - one for local testing and one for the WordPress post. The HTML can be
  * viewed in a local browser for quick development. The WP HTML can be pasted into the "text" tab of
  * the WP post editor.
- * @param studentWork
- * @param resizedImages
- * @returns {[string, string]}
  */
 function buildHtml(
   studentWork: StudentWork[],
@@ -305,11 +266,13 @@ ${imgPost.join("")}
 }
 
 async function main() {
-  const studentWork = await parseStudentWork(csvPath);
+  const { formDataPath, csvPath, outputDirectory, outputImagesDirectory, wpImagesUrl } =
+    parseCommandLineArgs();
+  const studentWork = await parseStudentWork(formDataPath, csvPath);
 
-  clearOutputDirectory();
+  clearOutputDirectory(outputDirectory, outputImagesDirectory);
 
-  const resizedImages = await generateImages(studentWork);
+  const resizedImages = await generateImages(studentWork, outputDirectory, outputImagesDirectory);
 
   const [post, html] = buildHtml(studentWork, resizedImages);
   fs.writeFileSync(path.join(outputDirectory, "local-test.html"), html);
