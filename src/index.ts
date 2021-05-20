@@ -181,15 +181,21 @@ function buildHtml(
   let html = "";
   let post = "";
 
+  // Create a list of unique students for the table of contents.
+  const uniqueStudents = studentWork.filter((work1, i) => {
+    if (studentWork.findIndex((work2, j) => work1.name === work2.name) === i) return true;
+    else return false;
+  });
+
   html += `
     <h1 id="top">Showcase</h1>
     <p>Thanks to all the students who submitted work this semester! Explore their work by scrolling through the post or jumping to specific student's work via these links:
-    ${studentWork.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}</p>
+    ${uniqueStudents.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}</p>
   `;
 
   post += `<h1 id="top">Showcase</h1>
 Thanks to all the students who submitted work this semester! Explore their work by scrolling through the post or jumping to specific student's work via these links:
-${studentWork.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}
+${uniqueStudents.map((w) => `<a href="#student-${w.id}">${w.name}</a>`).join(", ")}
 `;
 
   for (let i = 0; i < studentWork.length; i++) {
