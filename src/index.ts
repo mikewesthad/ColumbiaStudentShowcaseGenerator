@@ -34,7 +34,11 @@ type ResizedImageInfo = {
 /**
  * Parse the given CSV path into an array of StudentWork objects.
  */
-async function parseStudentWork(formDataPath: string, csvPath: string): Promise<StudentWork[]> {
+async function parseStudentWork(
+  formDataPath: string,
+  csvPath: string,
+  allowMultiple: boolean
+): Promise<StudentWork[]> {
   const rawData = await parseFormCsv(csvPath);
 
   const processedData: StudentWork[] = [];
@@ -65,7 +69,7 @@ async function parseStudentWork(formDataPath: string, csvPath: string): Promise<
 
     const containsName = processedData.findIndex((d) => d.name === name) !== -1;
     const isCourseWork = isCourseWorkString === "Yes";
-    if (!containsName) {
+    if (!containsName || allowMultiple) {
       processedData.push({
         id,
         startTime,
@@ -266,9 +270,15 @@ ${imgPost.join("")}
 }
 
 async function main() {
-  const { formDataPath, csvPath, outputDirectory, outputImagesDirectory, wpImagesUrl } =
-    parseCommandLineArgs();
-  const studentWork = await parseStudentWork(formDataPath, csvPath);
+  const {
+    formDataPath,
+    csvPath,
+    outputDirectory,
+    outputImagesDirectory,
+    allowMultiple,
+    wpImagesUrl,
+  } = parseCommandLineArgs();
+  const studentWork = await parseStudentWork(formDataPath, csvPath, allowMultiple);
 
   clearOutputDirectory(outputDirectory, outputImagesDirectory);
 
