@@ -67,28 +67,30 @@ async function parseStudentWork(
     // Generate image data and check that images have been downloaded.
     const images = parseImages(imageString, id, formDataPath);
 
-    const containsName = processedData.findIndex((d) => d.name === name) !== -1;
-    const isCourseWork = isCourseWorkString === "Yes";
-    if (!containsName || allowMultiple) {
-      processedData.push({
-        id,
-        startTime,
-        completionTime,
-        email,
-        name,
-        title,
-        credit,
-        images,
-        link,
-        description,
-        isCourseWork,
-        course,
-      });
-    } else {
+    const existingIndex = processedData.findIndex((d) => d.name === name);
+    const containsName = existingIndex !== -1;
+    if (containsName && !allowMultiple) {
+      processedData.splice(existingIndex, 1);
       console.warn(
-        `Multiple work submitted by the same student ${name} - using only the 1st submission.`
+        `Multiple work submitted by the same student ${name} - using only the most recent submission.`
       );
     }
+
+    const isCourseWork = isCourseWorkString === "Yes";
+    processedData.push({
+      id,
+      startTime,
+      completionTime,
+      email,
+      name,
+      title,
+      credit,
+      images,
+      link,
+      description,
+      isCourseWork,
+      course,
+    });
   }
 
   return processedData;
