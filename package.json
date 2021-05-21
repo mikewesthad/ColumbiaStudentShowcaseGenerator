@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node src/index.ts --path \"./Form Export\" --csv \"./Form Export/Call for IAM Student Work Spring 2021 - Cleaned.csv\" --wpUrl \"../wp-content/uploads/showcases/2021-spring\" --output \"./out\" --allowMultiple",
-    "help": "ts-node src/index.ts --help"
+    "help": "ts-node src/index.ts --help",
+    "ts-node": "ts-node src/index.ts"
   },
   "author": "",
   "license": "ISC",
